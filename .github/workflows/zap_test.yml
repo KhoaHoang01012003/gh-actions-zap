@@ -34,7 +34,7 @@ jobs:
           mkdir -p ./zap
           cd ./zap
           # Tải ZAP 2.14.0
-          wget -N https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2_14_0_linux.tar.gz
+          wget -N https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz
           tar -zxvf ZAP_2_14_0_linux.tar.gz
           rm ZAP_2_14_0_linux.tar.gz
           cd ZAP_2_14_0/plugin
