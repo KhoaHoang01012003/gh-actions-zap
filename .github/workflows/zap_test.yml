@@ -35,7 +35,7 @@ jobs:
         with:
           type: "python"
       - name: Upload SAST reports
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: reports
           path: reports
