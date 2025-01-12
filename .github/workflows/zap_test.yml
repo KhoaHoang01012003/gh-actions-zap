@@ -29,43 +29,16 @@ jobs:
       
       - name: Build Image
         run: docker build -t vulnerable-app .
-      
-      # # Tải và cài đặt ZAP 2.14.0
-      # - name: Install OWASP ZAP 2.14.0
-      #   run: |
-      #     mkdir -p ./zap
-      #     cd ./zap
-      #     wget -N https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz
-      #     tar -zxvf ZAP_2.14.0_Linux.tar.gz
-      #     rm ZAP_2.14.0_Linux.tar.gz
-
-      #     # (Tuỳ chọn) Cài plugin exportreport (nếu cần)
-      #     cd ZAP_2.14.0/plugin
-      #     wget https://github.com/zaproxy/zap-extensions/releases/download/exportreport-v6/exportreport-alpha-6.zap
-
-      #     # Quay lại thư mục gốc cài ZAP
-      #     cd ..
-
-      #     # Tạo file start-zap, stop-zap cho tiện (nếu cần)
-      #     echo 'export PATH_ZAP_SH=./zap/ZAP_2.14.0/zap.sh' >> ~/.bashrc
-      #     echo 'export ZAP_PORT=8090' >> ~/.bashrc
-
-      #     echo 'sh -c "$PATH_ZAP_SH -daemon -host 0.0.0.0 -port $ZAP_PORT" > /dev/null & ' > start-zap
-      #     echo 'sleep 40' >> start-zap
-
-      #     echo 'sh -c "$PATH_ZAP_SH -host 0.0.0.0 -port $ZAP_PORT" > /dev/null & ' > start-gui-zap
-      #     echo 'sleep 40' >> start-gui-zap
-
-      #     echo 'pkill -f zap' > stop-zap
-
-      #     chmod +x start-zap
-      #     chmod +x start-gui-zap
-      #     chmod +x stop-zap
-
-      #     pwd
-      #     ls -la
-
-          
+      # SAST Scan
+      - name: SAST Scan
+        uses: AppThreat/sast-scan-action@master
+        with:
+          type: "python"
+      - name: Upload SAST reports
+        uses: actions/upload-artifact@v1
+        with:
+          name: reports
+          path: reports
       # Chạy container trên cổng 5050
       - name: Run Docker Container
         run: |
@@ -75,35 +48,6 @@ jobs:
           # Kiểm tra nhanh container
           curl -I http://localhost:5050 || exit 1
       
-      # # Khởi chạy ZAP daemon trên cổng 8090
-      # - name: Run ZAP Daemon
-      #   run: |
-      #     /home/runner/work/gh-actions-zap/gh-actions-zap/zap/ZAP_2.14.0/zap.sh -daemon \
-      #       -host 0.0.0.0 \
-      #       -port 8090 \
-      #       -config api.addrs.addr.name=".*" \
-      #       -config api.addrs.addr.regex=true \
-      #       -config api.disablekey=true > /dev/null &
-      
-      # # Đợi ZAP khởi động lâu hơn (tăng thời gian chờ)
-      # - name: Sleep for ZAP startup
-      #   uses: jakejarvis/wait-action@master
-      #   with:
-      #     time: '40s'
-      
-      # # (Tuỳ chọn) Nếu KHÔNG muốn requests đi qua proxy, huỷ biến môi trường:
-      # - name: Unset Proxy (optional)
-      #   run: |
-      #     unset HTTP_PROXY
-      #     unset HTTPS_PROXY
-      #     unset http_proxy
-      #     unset https_proxy
-      
-      # (Hoặc) Nếu MUỐN đi qua proxy -> export HTTP_PROXY=...
-      # - name: Set Proxy (optional)
-      #   run: |
-      #     export HTTP_PROXY=http://127.0.0.1:8090
-      #     export HTTPS_PROXY=http://127.0.0.1:8090
 
       # Chạy script test automation (e2e_zap.py) 
       - name: ZAP Scan
